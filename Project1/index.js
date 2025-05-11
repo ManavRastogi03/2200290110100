@@ -15,19 +15,27 @@ const endpoints = {
 
 app.get('/numbers/:numberid', async (req, res) => {
   const id = req.params.numberid;
-  const url = BASE_URL + endpoints[id]; 
+  const url = BASE_URL + endpoints[id];
 
-  if (!url) {
+  if (!endpoints[id]) {
     return res.status(400).json({ error: 'Invalid numberid' });
   }
 
   let numbers = [];
 
   try {
-    const response = await axios.get(url, { timeout: 500 });
-    numbers = response.data.numbers || [];
+    console.log("Fetching from:", url);
+   const response = await axios.get(url, {
+  timeout: 500,
+  headers: {
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzQ2Nzk5OTY4LCJpYXQiOjE3NDY3OTk2NjgsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6IjFmYTIyNzM1LTkyNzktNDkwZC1hZDRhLTRiOGVmNWEwMTc0MCIsInN1YiI6Im1hbmF2LjIyMjZjc2l0MTA0NkBraWV0LmVkdSJ9LCJlbWFpbCI6Im1hbmF2LjIyMjZjc2l0MTA0NkBraWV0LmVkdSIsIm5hbWUiOiJtYW5hdiByYXN0b2dpIiwicm9sbE5vIjoiMjIwMDI5MDExMDEwMCIsImFjY2Vzc0NvZGUiOiJTeFZlamEiLCJjbGllbnRJRCI6IjFmYTIyNzM1LTkyNzktNDkwZC1hZDRhLTRiOGVmNWEwMTc0MCIsImNsaWVudFNlY3JldCI6Ik1ya1hTU2Zzc2pGVEpVZmQifQ.RkbULvRLGdmemNYMZ6dnL-toSxSpe_TwNEoXg12C_xc'
+  }
+});
+    console.log("Response data:", response.data);
+
+    numbers = response.data?.numbers || [];
   } catch (err) {
-    console.log("Error or timeout while fetching:", err.message);
+    console.error("Error fetching numbers:", err.message);
   }
 
   const { prevState, currState } = updateWindow(numbers);
@@ -40,6 +48,7 @@ app.get('/numbers/:numberid', async (req, res) => {
     avg: avg
   });
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
